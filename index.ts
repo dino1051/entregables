@@ -1,7 +1,7 @@
-//import readline from 'readline/promises';
-//import { stdin as input, stdout as output } from 'process';
+import readline from 'readline/promises';
+import { stdin as input, stdout as output } from 'process';
 
-//const rl = readline.createInterface({ input, output });
+const rl = readline.createInterface({ input, output });
 // 🚫 No eliminar las líneas de arriba ⬆️
 
 // ✍️ Escribe tu código aquí 👇
@@ -16,4 +16,4 @@ const msg01: string = '¡Bienvenido, '
 console.log(lines+msg00+version+"\n"+msg01+userName+"!"+lines)
 
 // 🚫 No eliminar las líneas de abajo ⬇️
-//rl.close();
+rl.close();
