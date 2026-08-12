@@ -19,13 +19,12 @@ console.log(lines+msg00+version+"\n"+msg01+userName+"!"+lines)
 
 while(status){
 
-    let ans = await rl.question("")
     console.log(`${lines} Qué deseas hacer?
         1. Agregar el título de un libro
         2. Eliminar el título del último libro agregado
         3. Mostrar todos los títulos de libros
         4. Salir del programa${lines}`)
-    
+    let ans = await rl.question("")
     switch (parseInt(ans)){
         case 1:
             let libro = await rl.question("Ingresa el titulo: ");
