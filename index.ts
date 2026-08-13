@@ -9,43 +9,148 @@ let systemName: string = "Windows 11";
 let version: number = 23.2 ;
 let userName: string = "Daniel S";
 
-const lines: string = "\n==================================\n"
-const msg00: string = 'Nombre del sistema v'
-const msg01: string = '¡Bienvenido, '
-let opcion: number = 0;
-let titulos: string[] = []
-let status: boolean = true
-console.log(lines+msg00+version+"\n"+msg01+userName+"!"+lines)
+const initMsg: string = `
+        ==================================
+            Nombre del sistema v${version}
+            ¡Bienvenido, ${userName}!
+        ==================================`;
+const menuMsg: string = `
+        ==================================
+            Qué deseas hacer?
+                1. Agregar una tarea.
+                2. Eliminar una tarea.
+                3. Mostrar todas las tareas.
+                4. Marcar tarea completada.
+                5. Salir del programa.
+        ==================================`;
 
-while(status){
-
-    console.log(`${lines} Qué deseas hacer?
-        1. Agregar el título de un libro
-        2. Eliminar el título del último libro agregado
-        3. Mostrar todos los títulos de libros
-        4. Salir del programa${lines}`)
-    let ans = await rl.question("")
-    switch (parseInt(ans)){
-        case 1:
-            let libro = await rl.question("Ingresa el titulo: ");
-            titulos.push(libro);
-            console.log(`Se ha agregado ${libro} a la lista`);
-        case 2:
-            console.log(`Se ha eliminado ${titulos[titulos.length]} de la lista`);
-            titulos.pop();
-        case 3:
-            for (let i = 0;i < titulos.length;i++) {
-                console.log(`${i}: ${titulos[i]}`);                
-            }
-        case 4:
-            status = false;
-            console.log(`Buen día, ${userName}, hasta pronto.`)
-            break;
-        default:
-            console.log('Opcion no valida, vuelve a intentarlo')
-    }
-
+interface Task{
+    id: number;
+    title: string;
+    completed: boolean;
 }
+let n: number = 0;
+let tasks: Task[] = [];
+
+const addTask = (title:string) =>{ 
+    let tarea: Task = {
+        id:n,
+        title:title,
+        completed: false
+    }
+    tasks.push(tarea);
+    n++;
+    console.log(`
+        ==================================
+            Se ha agregado correctamente la tarea: ${title}
+        ==================================
+        `)
+}
+const listTasks = () =>{
+    for (let i = 0; i < tasks.length; i++){
+        let j = tasks[i].id + 1;
+        let status: string;
+        if(tasks[i].completed){status="completed"}else{status="pending"}
+        console.log(`[${j}] ${tasks[i]?.title} - ${status}`);        
+    }
+}
+
+const removeTask = (n:number,tasks:Task[]):void=> {
+    let tasks2: Task[] = [];
+    if(n<(tasks.length/2)){
+        let j = 0;
+        for (let i = 0; i < n; i++) {
+            tasks2.push(tasks[j]);
+            tasks.shift();
+     
+        }
+        tasks.shift();
+        for (let i = tasks2.length-1;i >= 0;i--){
+            tasks.unshift(tasks2[i]);
+        }
+    }else{
+        let j = tasks.length-1;
+        for (let i = tasks.length-1; i > n; i--) {
+            tasks2.push(tasks[j]);
+            tasks.pop();
+            j--;
+        }
+        tasks.pop();
+        for (let i = tasks2.length-1;i >= 0;i--){
+            tasks.push(tasks[i]);
+        
+            }
+        }
+}
+const recorrerId = (n:number,tasks:Task[]) =>{
+    for (let i = 0; i < tasks.length; i++) {
+        tasks[i].id = i;     
+    }
+}
+
+
+console.log(initMsg);
+
+do {
+    console.log(menuMsg);
+    let ans = await rl.question("");
+    ans = parseInt(ans);
+    if(ans == 1){
+        let title = await rl.question("Ingrese la tarea que desea agregar\n");
+        
+        addTask(title);
+    };
+    if(ans == 2){
+        if(n==0){console.log(`
+        ==================================
+            No hay tareas que mostrar!
+        ==================================`)}
+        else{
+            let index = await rl.question("Qué número de tarea deseas eliminar?\n");
+            index--;
+            if(index<=n){
+                console.log(`
+        ==================================
+            Has eliminado la tarea ${tasks[index].title} !
+        ==================================
+                `)
+                removeTask(index,tasks);
+                recorrerId(n,tasks)
+                n--;
+            }
+            else{
+                console.log(`Ingrese un número valido`)
+            }
+        }
+          
+    };
+    if(ans == 3){
+        if(n==0){console.log(`
+        ==================================
+            La lista de tareas está vacía!
+        ==================================`)}else{
+            listTasks();
+        }
+    };
+    if(ans == 4){
+        if(n==0){console.log(`
+        ==================================
+            La lista de tareas está vacía!
+        ==================================`)}
+        else{
+            let index = await rl.question("Qué número de tarea deseas marcar como completada?\n");
+            index--;
+                if(index<=n){
+                    tasks[index].completed = true;
+                }  
+            }
+    }
+    if(ans == 5){
+        console.log(`Buen día, ${userName}, hasta pronto.`)
+        break;
+    };
+}while (true);
+        
 
 // 🚫 No eliminar las líneas de abajo ⬇️
 rl.close();
