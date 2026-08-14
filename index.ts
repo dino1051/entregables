@@ -21,7 +21,9 @@ const menuMsg: string = `
                 2. Eliminar una tarea.
                 3. Mostrar todas las tareas.
                 4. Marcar tarea completada.
-                5. Salir del programa.
+                5. Mostrar tareas pendientes.
+                6. Mostrar tareas completadas.
+                7. Salir del programa.
         ==================================`;
 
 interface Task{
@@ -32,27 +34,25 @@ interface Task{
 let n: number = 0;
 let tasks: Task[] = [];
 
-const addTask = (title:string) =>{ 
+const addTask = (title:string) =>{
+    n++
     let tarea: Task = {
         id:n,
         title:title,
         completed: false
     }
     tasks.push(tarea);
-    n++;
     console.log(`
         ==================================
-            Se ha agregado correctamente la tarea: ${title}
+        Se ha agregado correctamente la tarea: ${title}
         ==================================
         `)
 }
-const listTasks = () =>{
-    for (let i = 0; i < tasks.length; i++){
-        let j = tasks[i].id + 1;
-        let status: string;
-        if(tasks[i].completed){status="completed"}else{status="pending"}
-        console.log(`[${j}] ${tasks[i]?.title} - ${status}`);        
-    }
+const listTasks = (tasks:Task[]) =>{
+    let lista = tasks.map(task=>task.completed?`
+        [${task.id}] ${task.title} - completed`:`
+        [${task.id}] ${task.title} - pending`);  
+    lista.forEach((cadena:string)=>{console.log(cadena)});
 }
 
 const removeTask = (n:number,tasks:Task[]):void=> {
@@ -82,12 +82,28 @@ const removeTask = (n:number,tasks:Task[]):void=> {
             }
         }
 }
+/*
 const recorrerId = (n:number,tasks:Task[]) =>{
     for (let i = 0; i < tasks.length; i++) {
         tasks[i].id = i;     
     }
 }
+*/
 
+const markCompleted = (id: number,tasks:Task[]) =>{
+    const found = tasks.find((element) => element.id === id);
+    found.completed = true;
+    return found;
+}
+
+const filterPending = (task:Task[]):Task[] =>{
+    const filtro = tasks.filter((task) => task.completed === false);
+    return filtro;
+}
+const filterCompleted = (task:Task[]):Task[] =>{
+    const filtro = tasks.filter((task) => task.completed === true);
+    return filtro;
+}
 
 console.log(initMsg);
 
@@ -115,7 +131,7 @@ do {
         ==================================
                 `)
                 removeTask(index,tasks);
-                recorrerId(n,tasks)
+                //recorrerId(n,tasks)
                 n--;
             }
             else{
@@ -129,7 +145,7 @@ do {
         ==================================
             La lista de tareas está vacía!
         ==================================`)}else{
-            listTasks();
+            listTasks(tasks);
         }
     };
     if(ans == 4){
@@ -139,13 +155,43 @@ do {
         ==================================`)}
         else{
             let index = await rl.question("Qué número de tarea deseas marcar como completada?\n");
-            index--;
-                if(index<=n){
-                    tasks[index].completed = true;
-                }  
-            }
+            index = parseInt(index)
+            if(index<=n){
+                    markCompleted(index,tasks);
+                    console.log(`
+        ==================================
+        Ahora ${markCompleted(index,tasks).title} está completada
+        ==================================`);
+            }  
+        }
     }
     if(ans == 5){
+        if(n==0){console.log(`
+        ==================================
+            La lista de tareas está vacía!
+        ==================================`)}
+        else{
+            if(typeof(filterPending(tasks)[0])!=typeof(undefined)){
+                listTasks(filterPending(tasks));
+            }else{console.log(`
+        ==================================
+            La lista de tareas pendientes está vacía!
+        ==================================`)}
+    }}
+    if(ans == 6){
+        if(n==0){console.log(`
+        ==================================
+            La lista de tareas está vacía!
+        ==================================`)}
+        else{
+            if(typeof(filterCompleted(tasks)[0])!=typeof(undefined))
+                {
+        listTasks(filterCompleted(tasks));
+            }else{console.log(`
+        ==================================
+            La lista de tareas completadas está vacía!
+        ==================================`)}}}
+    if(ans == 7){
         console.log(`Buen día, ${userName}, hasta pronto.`)
         break;
     };
